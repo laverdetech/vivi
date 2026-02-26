@@ -167,12 +167,22 @@
 
     <!-- Navigation -->
     <nav class="fixed top-0 w-full z-50 glass-panel !rounded-none !border-t-0 !border-x-0 !bg-[#0B1C2D]/60 flex justify-between items-center px-6 md:px-8 py-4">
-        <div class="text-2xl font-bold tracking-widest text-white">
-            Vi<span class="text-[#00C48C]">Vi</span>
+        <div class="flex items-center gap-6 md:gap-10">
+            <a href="https://vivipremium.netlify.app/" class="text-2xl font-bold tracking-widest text-white hover:opacity-80 transition-opacity">
+                Vi<span class="text-[#00C48C]">Vi</span>
+            </a>
+            <a href="https://vivipremium.netlify.app/" class="hidden md:block text-sm font-semibold text-gray-300 hover:text-[#00C48C] transition-colors">
+                Hlavná stránka
+            </a>
         </div>
-        <button class="bg-gradient-to-r from-[#00C48C] to-[#008f66] text-white px-5 md:px-6 py-2 rounded-full font-semibold hover:shadow-[0_0_20px_rgba(0,196,140,0.4)] transition-all text-sm md:text-base">
-            Vstúpiť do ekosystému
-        </button>
+        <div class="flex items-center gap-4">
+            <a href="https://vivipremium.netlify.app/" class="md:hidden text-sm font-semibold text-gray-300 hover:text-[#00C48C] transition-colors">
+                Domov
+            </a>
+            <a href="https://vivi.you/auth?mode=signup&ref=c206dfc0" target="_blank" class="bg-gradient-to-r from-[#00C48C] to-[#008f66] text-white px-5 md:px-6 py-2 rounded-full font-semibold hover:shadow-[0_0_20px_rgba(0,196,140,0.4)] transition-all text-sm md:text-base inline-block text-center">
+                Vstúpiť do ekosystému
+            </a>
+        </div>
     </nav>
 
     <!-- Main Content -->
@@ -463,12 +473,12 @@
                     Systém je navrhnutý tak, aby fungoval aj offline (pasívna záloha). Nečakajte na budúcnosť – vytvorte si ju.
                 </p>
                 <div class="flex flex-col sm:flex-row justify-center gap-4">
-                    <button class="bg-gradient-to-r from-[#00C48C] to-[#008f66] text-white px-8 py-4 rounded-full font-bold text-lg hover:shadow-[0_0_30px_rgba(0,196,140,0.5)] transition-all flex items-center justify-center gap-2">
+                    <a href="https://vivi.you/auth?mode=signup&ref=c206dfc0" target="_blank" class="bg-gradient-to-r from-[#00C48C] to-[#008f66] text-white px-8 py-4 rounded-full font-bold text-lg hover:shadow-[0_0_30px_rgba(0,196,140,0.5)] transition-all flex items-center justify-center gap-2">
                         Vstúpiť do rodiny ViVi <i data-lucide="arrow-right"></i>
-                    </button>
-                    <button class="glass-panel px-8 py-4 rounded-full font-bold text-lg text-white hover:border-[#00C48C] transition-all">
-                        Získať skorý prístup
-                    </button>
+                    </a>
+                    <a href="https://vivipremium.netlify.app/" class="glass-panel px-8 py-4 rounded-full font-bold text-lg text-white hover:border-[#00C48C] transition-all flex items-center justify-center text-center">
+                        Návrat na hlavnú stránku
+                    </a>
                 </div>
             </div>
         </section>
