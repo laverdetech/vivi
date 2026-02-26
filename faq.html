@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="sk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ViVi Experience | Smart Life OS</title>
+    
+    <!-- Tailwind CSS (via CDN pre okamžité fungovanie) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-dark: #0B1C2D;
+            --emerald: #00C48C;
+            --gold: #D4AF37;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: white;
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+        }
+
+        /* --- Liquid Glass 2.0 --- */
+        .glass-panel {
+            background: rgba(11, 28, 45, 0.45);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1px solid rgba(0, 196, 140, 0.15);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5), inset 0 0 32px rgba(0, 196, 140, 0.02);
+            border-radius: 24px;
+            transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+
+        .glass-panel:hover {
+            border: 1px solid rgba(0, 196, 140, 0.4);
+            box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.6), inset 0 0 40px rgba(0, 196, 140, 0.08);
+            transform: translateY(-4px);
+        }
+
+        /* --- Text Gradients --- */
+        .text-gradient {
+            background: linear-gradient(135deg, #00C48C 0%, #008f66 50%, #D4AF37 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-size: 200% auto;
+            animation: shine 5s linear infinite;
+        }
+
+        @keyframes shine {
+            to { background-position: 200% center; }
+        }
+
+        /* --- Ambient Background --- */
+        .ambient-bg {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            z-index: -1;
+            overflow: hidden;
+            background: var(--bg-dark);
+        }
+        .ambient-orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(120px);
+            opacity: 0.4;
+            animation: float 20s infinite alternate;
+        }
+        .orb-1 { top: -10%; left: -10%; width: 50vw; height: 50vw; background: rgba(0, 196, 140, 0.15); }
+        .orb-2 { bottom: -10%; right: -10%; width: 60vw; height: 60vw; background: rgba(212, 175, 55, 0.1); animation-direction: alternate-reverse; }
+        .orb-3 { top: 40%; left: 40%; width: 40vw; height: 40vw; background: rgba(0, 100, 255, 0.1); animation-duration: 25s; }
+
+        @keyframes float {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(50px, 50px) scale(1.1); }
+        }
+
+        /* --- Animations & Reveals --- */
+        .reveal {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: all 0.8s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* --- FAQ Accordion --- */
+        .faq-content {
+            transition: max-height 0.4s ease-out, opacity 0.4s ease-out, padding 0.4s ease-out;
+            max-height: 0;
+            opacity: 0;
+            overflow: hidden;
+        }
+        .faq-icon {
+            transition: transform 0.4s ease;
+        }
+
+        /* --- Card 3D Effect --- */
+        .vivi-card-container { perspective: 1000px; }
+        .vivi-card {
+            transition: all 0.6s cubic-bezier(0.25, 0.8, 0.25, 1);
+            transform-style: preserve-3d;
+        }
+        .card-off {
+            opacity: 0.3;
+            filter: grayscale(100%) blur(2px);
+        }
+
+        /* --- Split Screen (ISO SMART) --- */
+        .split-container {
+            display: flex;
+            overflow: hidden;
+            border-radius: 24px;
+            height: 400px;
+            cursor: crosshair;
+        }
+        .split-side {
+            flex: 1;
+            transition: all 0.5s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+        .split-left { background: #0a1017; border-right: 1px solid rgba(255,255,255,0.1); }
+        .split-left::before {
+            content: ''; position: absolute; inset: 0; opacity: 0.5; transition: opacity 0.5s ease;
+            background: radial-gradient(circle, rgba(0,100,255,0.2) 0%, transparent 70%);
+        }
+        .split-right { background: #11221c; }
+        .split-right::before {
+            content: ''; position: absolute; inset: 0; opacity: 0.5; transition: opacity 0.5s ease;
+            background: radial-gradient(circle, rgba(0,196,140,0.4) 0%, transparent 70%);
+        }
+        .split-container:hover .split-left { flex: 0.5; }
+        .split-container:hover .split-right { flex: 1.5; }
+        .split-container:hover .split-right::before { opacity: 1; }
+
+        /* --- Tree Bar --- */
+        .tree-bar {
+            transition: height 1.5s cubic-bezier(0.25, 0.8, 0.25, 1);
+            height: 0%;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Ambient Background -->
+    <div class="ambient-bg">
+        <div class="ambient-orb orb-1"></div>
+        <div class="ambient-orb orb-2"></div>
+        <div class="ambient-orb orb-3"></div>
+    </div>
+
+    <!-- Scroll Progress Bar -->
+    <div id="scroll-progress" class="fixed top-0 left-0 height-[3px] h-1 bg-gradient-to-r from-[#00C48C] to-[#D4AF37] z-[100] w-0 transition-all duration-100 ease-out"></div>
+
+    <!-- Navigation -->
+    <nav class="fixed top-0 w-full z-50 glass-panel !rounded-none !border-t-0 !border-x-0 !bg-[#0B1C2D]/60 flex justify-between items-center px-6 md:px-8 py-4">
+        <div class="text-2xl font-bold tracking-widest text-white">
+            Vi<span class="text-[#00C48C]">Vi</span>
+        </div>
+        <button class="bg-gradient-to-r from-[#00C48C] to-[#008f66] text-white px-5 md:px-6 py-2 rounded-full font-semibold hover:shadow-[0_0_20px_rgba(0,196,140,0.4)] transition-all text-sm md:text-base">
+            Vstúpiť do ekosystému
+        </button>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="pt-32 pb-24 px-6 md:px-12 max-w-7xl mx-auto space-y-40">
+
+        <!-- 1. HERO SECTION -->
+        <section class="min-h-[80vh] flex flex-col items-center justify-center text-center relative reveal">
+            <div class="glass-panel p-1 md:p-2 mb-8 inline-block rounded-full">
+                <div class="bg-[#00C48C]/10 text-[#00C48C] px-6 py-2 rounded-full text-xs md:text-sm font-bold tracking-wide uppercase border border-[#00C48C]/20">
+                    Inteligentný operačný systém pre život
+                </div>
+            </div>
+            <h1 class="text-5xl md:text-7xl font-extrabold mb-6 tracking-tight">
+                Otázky, ktoré si kladú <br/>
+                <span class="text-gradient">vizionári.</span>
+            </h1>
+            <p class="text-xl md:text-2xl text-gray-400 max-w-3xl mb-12 font-light">
+                Komplexné odpovede o finančnej suverenite, biologickej optimalizácii a regenerácii planéty. Vitajte v ekosystéme ViVi.
+            </p>
+            
+            <div class="relative group cursor-pointer inline-block" onclick="document.getElementById('vision').scrollIntoView({behavior: 'smooth'})">
+                <div class="absolute -inset-1 bg-gradient-to-r from-[#00C48C] to-[#D4AF37] rounded-full blur opacity-25 group-hover:opacity-75 transition duration-1000 group-hover:duration-200"></div>
+                <button class="relative flex items-center gap-2 bg-[#0B1C2D] border border-[#00C48C]/50 px-8 py-4 rounded-full text-lg font-bold text-white transition-all group-hover:border-[#00C48C]">
+                    Preskúmať ekosystém <i data-lucide="chevron-down" class="animate-bounce mt-1"></i>
+                </button>
+            </div>
+        </section>
+
+        <!-- 2. VISION SECTION -->
+        <section id="vision" class="reveal">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl font-bold mb-4">Vízia a <span class="text-gradient">Fundamenty</span></h2>
+                <p class="text-gray-400 max-w-2xl mx-auto">Súčasný svet trpí informačnou presýtenosťou. ViVi eliminuje kognitívnu bariéru a slúži ako centrálny hub pre integrovaný životný štýl.</p>
+            </div>
+            <div class="max-w-4xl mx-auto space-y-4" id="faq-container">
+                
+                <!-- FAQ Item 1 -->
+                <div class="glass-panel overflow-hidden cursor-pointer faq-item border-[#00C48C]/50">
+                    <div class="faq-header p-6 flex justify-between items-center">
+                        <h3 class="text-xl font-semibold text-white/90">Prečo svet potrebuje ViVi práve teraz?</h3>
+                        <i data-lucide="chevron-down" class="faq-icon text-[#00C48C] transform rotate-180"></i>
+                    </div>
+                    <div class="faq-content px-6 opacity-100 pb-6" style="max-height: 500px;">
+                        <p class="text-gray-400 leading-relaxed">Bežný profesionál spravuje svoje zdravie, financie a investície v desiatkach nekompatibilných platforiem. ViVi túto kognitívnu bariéru eliminuje. Slúži ako centrálny hub pre „integrovaný životný štýl“, kde každá akcia v jednej sfére (napr. platba) môže pozitívne ovplyvniť sféru druhú (napr. zdravie alebo ekológiu). ViVi transformuje pasívneho klienta na aktívny uzol v distribuovanom systéme zdieľanej hodnoty.</p>
+                    </div>
+                </div>
+
+                <!-- FAQ Item 2 -->
+                <div class="glass-panel overflow-hidden cursor-pointer faq-item">
+                    <div class="faq-header p-6 flex justify-between items-center">
+                        <h3 class="text-xl font-semibold text-white/90">Aká je genéza názvu „ViVi“ a filozofia zakladateľa?</h3>
+                        <i data-lucide="chevron-down" class="faq-icon text-[#00C48C]"></i>
+                    </div>
+                    <div class="faq-content px-6">
+                        <p class="text-gray-400 leading-relaxed">Názov vychádza z latinského koreňa „viv“ (život). Projekt je výsledkom 12-ročného vývoja a osobnej transformácie zakladateľa, Jaroslava Feča. Katalyzátorom zmeny bolo narodenie jeho dcéry Vivi. Tento moment zmenil technologický projekt na celoživotné poslanie – vytvoriť nadstavbu, ktorá nikoho nevylučuje, nikoho neobmedzuje, ale spája technologický progres s prirodzenými zákonmi prírody.</p>
+                    </div>
+                </div>
+
+                <!-- FAQ Item 3 -->
+                <div class="glass-panel overflow-hidden cursor-pointer faq-item">
+                    <div class="faq-header p-6 flex justify-between items-center">
+                        <h3 class="text-xl font-semibold text-white/90">V čom spočíva strategický posun oproti bežným fintech platformám?</h3>
+                        <i data-lucide="chevron-down" class="faq-icon text-[#00C48C]"></i>
+                    </div>
+                    <div class="faq-content px-6">
+                        <p class="text-gray-400 leading-relaxed">Zatiaľ čo bežné bankové aplikácie končia pri realizácii transakcie, ViVi ju vníma ako začiatok procesu. Systém je navrhnutý ako organická štruktúra, kde je „komunita menou“. Namiesto boja proti zastaraným systémom ViVi buduje paralelnú, suverénnu infraštruktúru, ktorá funguje efektívnejšie a etickejšie.</p>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- 3. FINANCE & CARDS -->
+        <section class="reveal grid md:grid-cols-2 gap-16 items-center">
+            <div>
+                <div class="flex items-center gap-3 mb-4">
+                    <div class="p-2 bg-[#00C48C]/20 rounded-lg text-[#00C48C]"><i data-lucide="credit-card"></i></div>
+                    <h2 class="text-3xl font-bold">Digitálne <span class="text-gradient">Financie</span></h2>
+                </div>
+                <p class="text-gray-400 mb-8 leading-relaxed">
+                    Mena ViVi funguje v parite 1:1 k euru, čo zabezpečuje absolútnu stabilitu. Systém odstraňuje sprostredkovateľov a umelé limity. Nákup vozidla v zahraničí? Jedno pípnutie.
+                </p>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div class="glass-panel p-6 flex flex-col items-start gap-4">
+                        <div class="p-3 rounded-full bg-[#00C48C]/10 text-[#00C48C] shadow-[0_0_15px_rgba(0,196,140,0.2)]"><i data-lucide="globe"></i></div>
+                        <div>
+                            <h4 class="text-lg font-bold text-white mb-2">Absolútna suverenita</h4>
+                            <p class="text-sm text-gray-400 leading-relaxed">Funkčná globálne. Ultimátny nástroj pre medzinárodný obchod.</p>
+                        </div>
+                    </div>
+                    <div class="glass-panel p-6 flex flex-col items-start gap-4">
+                        <div class="p-3 rounded-full bg-[#00C48C]/10 text-[#00C48C] shadow-[0_0_15px_rgba(0,196,140,0.2)]"><i data-lucide="activity"></i></div>
+                        <div>
+                            <h4 class="text-lg font-bold text-white mb-2">Pasívny príjem</h4>
+                            <p class="text-sm text-gray-400 leading-relaxed">Systém distribuuje 90 % zisku späť komunite uzlov siete.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="vivi-card-container flex flex-col items-center justify-center">
+                <!-- 3D Card -->
+                <div id="vivi-card" class="vivi-card w-full max-w-sm h-56 rounded-2xl p-6 relative overflow-hidden shadow-2xl bg-gradient-to-br from-[#1a2e40] to-[#0B1C2D] border border-[#00C48C]/50">
+                    <div class="absolute top-0 right-0 w-32 h-32 bg-[#00C48C]/20 rounded-full blur-3xl"></div>
+                    <div class="flex justify-between items-start h-full flex-col relative z-10">
+                        <div class="flex justify-between w-full">
+                            <div class="text-2xl font-bold">ViVi</div>
+                            <i id="cpu-icon" data-lucide="cpu" class="text-[#D4AF37]"></i>
+                        </div>
+                        <div class="w-full">
+                            <div class="font-mono text-lg tracking-widest mb-2 opacity-80">•••• •••• •••• 8842</div>
+                            <div class="flex justify-between text-sm opacity-60">
+                                <span>VIVI MEMBER</span>
+                                <span>∞ LIMIT</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- On/Off Switch -->
+                <div id="card-switch" class="mt-8 glass-panel p-4 flex items-center gap-4 cursor-pointer">
+                    <div class="text-sm font-semibold text-gray-300">On/Off Switch:</div>
+                    <div id="switch-bg" class="w-16 h-8 rounded-full p-1 transition-colors bg-[#00C48C]">
+                        <div id="switch-knob" class="w-6 h-6 rounded-full bg-white transition-transform transform translate-x-8 flex items-center justify-center">
+                            <i id="icon-on" data-lucide="eye" class="text-[#00C48C] w-4 h-4"></i>
+                            <i id="icon-off" data-lucide="eye-off" class="text-gray-600 w-4 h-4 hidden"></i>
+                        </div>
+                    </div>
+                    <div class="text-xs text-gray-400 max-w-[120px]">
+                        Zneviditeľní kartu v systéme pre ochranu.
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 4. QUANTUM BIOHACKING -->
+        <section class="reveal relative">
+            <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-[#00C48C]/10 via-transparent to-transparent opacity-50 blur-2xl z-0"></div>
+            <div class="relative z-10 text-center mb-16">
+                <h2 class="text-4xl font-bold mb-4">ViVi <span class="text-gradient">Quantum</span></h2>
+                <p class="text-gray-400 max-w-2xl mx-auto">Bio-hacking pre maximálnu efektivitu. Bunkové napätie priamo ovplyvňuje kognitívnu kapacitu a finančné rozhodovanie.</p>
+            </div>
+            
+            <div class="grid md:grid-cols-3 gap-6">
+                <div class="glass-panel p-8 relative overflow-hidden group">
+                    <i data-lucide="zap" class="absolute -right-10 -bottom-10 w-32 h-32 opacity-10 group-hover:opacity-30 transition-opacity"></i>
+                    <h3 class="text-xl font-bold text-[#00C48C] mb-4 border-b border-[#00C48C]/20 pb-2">Realtime Mode</h3>
+                    <p class="text-gray-400">Neustála analýza informačného poľa používateľa a aplikácia individualizovanej frekvencie (IMF) v reálnom čase.</p>
+                </div>
+                <div class="glass-panel p-8 relative overflow-hidden group">
+                    <i data-lucide="activity" class="absolute -right-10 -bottom-10 w-32 h-32 opacity-10 group-hover:opacity-30 transition-opacity"></i>
+                    <h3 class="text-xl font-bold text-[#D4AF37] mb-4 border-b border-[#D4AF37]/20 pb-2">Resonance Mode</h3>
+                    <p class="text-gray-400">Meranie rezonancie každých 10 sekúnd až do dosiahnutia 95 % optimálneho stavu a stimulácie ATP syntézy.</p>
+                </div>
+                <div class="glass-panel p-8 relative overflow-hidden group">
+                    <i data-lucide="fingerprint" class="absolute -right-10 -bottom-10 w-32 h-32 opacity-10 group-hover:opacity-30 transition-opacity"></i>
+                    <h3 class="text-xl font-bold text-white mb-4 border-b border-white/20 pb-2">Selection Mode</h3>
+                    <p class="text-gray-400">Cielený výber zo súboru 400 frekvencií pre konkrétne systémy pod dohľadom certifikovaných ViVi lekárov.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 5. VIVI GREEN -->
+        <section id="green-section" class="reveal grid md:grid-cols-2 gap-16 items-center">
+            <div class="order-2 md:order-1 relative h-80 flex items-end justify-between px-4 glass-panel pb-0">
+                <div class="w-full h-full flex items-end justify-around pb-8 relative z-10">
+                    <!-- CSS Animated Trees -->
+                    <div class="w-12 bg-gradient-to-t from-[#00C48C]/80 to-[#00C48C]/20 rounded-t-lg relative group">
+                        <div class="tree-bar absolute bottom-0 w-full bg-gradient-to-t from-[#00C48C] to-[#D4AF37] rounded-t-lg opacity-80" data-height="40%"></div>
+                        <div class="absolute -top-8 text-xs font-bold text-white opacity-0 group-hover:opacity-100 transition-opacity w-full text-center">Rok 2</div>
+                    </div>
+                    <div class="w-12 bg-gradient-to-t from-[#00C48C]/80 to-[#00C48C]/20 rounded-t-lg relative group">
+                        <div class="tree-bar absolute bottom-0 w-full bg-gradient-to-t from-[#00C48C] to-[#D4AF37] rounded-t-lg opacity-80" data-height="60%"></div>
+                        <div class="absolute -top-8 text-xs font-bold text-white opacity-0 group-hover:opacity-100 transition-opacity w-full text-center">Rok 3</div>
+                    </div>
+                    <div class="w-12 bg-gradient-to-t from-[#00C48C]/80 to-[#00C48C]/20 rounded-t-lg relative group">
+                        <div class="tree-bar absolute bottom-0 w-full bg-gradient-to-t from-[#00C48C] to-[#D4AF37] rounded-t-lg opacity-80" data-height="80%"></div>
+                        <div class="absolute -top-8 text-xs font-bold text-white opacity-0 group-hover:opacity-100 transition-opacity w-full text-center">Rok 4</div>
+                    </div>
+                    <div class="w-12 bg-gradient-to-t from-[#00C48C]/80 to-[#00C48C]/20 rounded-t-lg relative group">
+                        <div class="tree-bar absolute bottom-0 w-full bg-gradient-to-t from-[#00C48C] to-[#D4AF37] rounded-t-lg opacity-80" data-height="100%"></div>
+                        <div class="absolute -top-8 text-xs font-bold text-white opacity-0 group-hover:opacity-100 transition-opacity w-full text-center">Rok 5</div>
+                    </div>
+                </div>
+                <div class="absolute inset-0 bg-gradient-to-t from-[#0B1C2D] to-transparent z-0 rounded-2xl"></div>
+            </div>
+            
+            <div class="order-1 md:order-2">
+                <div class="flex items-center gap-3 mb-4">
+                    <div class="p-2 bg-[#00C48C]/20 rounded-lg text-[#00C48C]"><i data-lucide="leaf"></i></div>
+                    <h2 class="text-3xl font-bold">ViVi <span class="text-gradient">Green</span> & RWA</h2>
+                </div>
+                <p class="text-gray-400 mb-6 leading-relaxed">
+                    Transformujeme ESG investovanie z charitatívneho konceptu na motor rastu. Eukalyptové plantáže v Paraguaji rastú 365 dní v roku vďaka absencii zimy.
+                </p>
+                <ul class="space-y-4">
+                    <li class="flex items-start gap-3">
+                        <div class="mt-1 text-[#00C48C]"><i data-lucide="chevron-right" class="w-5 h-5"></i></div>
+                        <div><strong class="text-white">Priemerný rast:</strong> <span class="text-gray-400">47,8 m³/ha (cyklus 6-8 rokov).</span></div>
+                    </li>
+                    <li class="flex items-start gap-3">
+                        <div class="mt-1 text-[#00C48C]"><i data-lucide="chevron-right" class="w-5 h-5"></i></div>
+                        <div><strong class="text-white">Dedičné právo (Hereditary Share):</strong> <span class="text-gray-400">Smart kontrakt definuje investíciu (od 10€) ako podiel pre ďalšie generácie.</span></div>
+                    </li>
+                    <li class="flex items-start gap-3">
+                        <div class="mt-1 text-[#00C48C]"><i data-lucide="chevron-right" class="w-5 h-5"></i></div>
+                        <div><strong class="text-white">Rozsah:</strong> <span class="text-gray-400">Spravovaných viac ako 2 500 hektárov (cez 1 milión stromov).</span></div>
+                    </li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- 6. ISO SMART -->
+        <section class="reveal">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl font-bold mb-4">ISO <span class="text-gradient">SMART</span></h2>
+                <p class="text-gray-400 max-w-2xl mx-auto">Váš domov ako liečivý chrám. Manželstvo materiálovej fyziky a bioenergetiky.</p>
+            </div>
+            
+            <div class="split-container border border-[#00C48C]/30 shadow-[0_0_30px_rgba(0,196,140,0.1)]">
+                <div class="split-side split-left flex-col text-center p-8">
+                    <h3 class="text-2xl font-bold mb-2 opacity-50 z-10">Bežná stena</h3>
+                    <p class="text-sm opacity-40 z-10">Tepelné úniky, pocit chladu</p>
+                    <div class="mt-auto text-4xl font-mono opacity-50 z-10">14°C</div>
+                </div>
+                <div class="split-side split-right flex-col text-center p-8">
+                    <div class="absolute top-4 right-4 bg-[#00C48C]/20 text-[#00C48C] px-3 py-1 rounded-full text-xs font-bold border border-[#00C48C]/50 z-10">Aktívny Negatívny ORP</div>
+                    <h3 class="text-2xl font-bold mb-2 text-[#00C48C] drop-shadow-[0_0_10px_rgba(0,196,140,0.8)] z-10">ISO SMART IN</h3>
+                    <p class="text-sm text-gray-300 max-w-xs z-10">Vrstva 1 mm nahrádza 8-10 cm polystyrénu. Vyžaruje negatívny náboj a neutralizuje voľné radikály.</p>
+                    <div class="mt-auto text-5xl font-mono text-[#00C48C] font-bold z-10">20°C</div>
+                </div>
+            </div>
+            <p class="text-center text-sm text-gray-500 mt-4 uppercase tracking-widest">Zníženie nákladov na vykurovanie o 28 % už počas prvej sezóny (EN certifikácia)</p>
+        </section>
+
+        <!-- 7. SECURITY -->
+        <section class="reveal text-center">
+            <div class="inline-flex items-center justify-center p-4 rounded-full bg-[#0B1C2D] border border-[#00C48C]/30 shadow-[0_0_50px_rgba(0,196,140,0.2)] mb-8">
+                <i data-lucide="shield" class="text-[#00C48C] w-12 h-12"></i>
+            </div>
+            <h2 class="text-4xl font-bold mb-6">Defenzívna AI na <span class="text-gradient">bankovej úrovni</span></h2>
+            <p class="text-gray-400 max-w-3xl mx-auto mb-12">
+                Ochrana dát je fundamentálnym právom. V spolupráci s Checkpoint (Dubaj) budujeme neprekonateľnú architektúru.
+            </p>
+            
+            <div class="flex flex-wrap justify-center gap-6">
+                <div class="glass-panel p-6 w-full max-w-xs">
+                    <div class="text-4xl font-bold text-white mb-2">42</div>
+                    <div class="text-[#00C48C] font-semibold mb-2">Vrstiev ochrany</div>
+                    <p class="text-xs text-gray-400">Vzájomne kooperujúce vrstvy eliminujúce hrozby v reálnom čase.</p>
+                </div>
+                <div class="glass-panel p-6 w-full max-w-xs">
+                    <div class="text-4xl font-bold text-white mb-2">15</div>
+                    <div class="text-[#00C48C] font-semibold mb-2">AI Programátorov</div>
+                    <p class="text-xs text-gray-400">Neživí zamestnanci, ktorí nepretržite monitorujú a bránia sieť.</p>
+                </div>
+                <div class="glass-panel p-6 w-full max-w-xs border-[#D4AF37]/30">
+                    <div class="text-4xl font-bold text-[#D4AF37] mb-2">0</div>
+                    <div class="text-[#D4AF37] font-semibold mb-2">Výluk z poistenia</div>
+                    <p class="text-xs text-gray-400">Unikátny precedens: poistenie proti hackerom bez akýchkoľvek výluk.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 8. NETWORK & OUTRO -->
+        <section class="reveal bg-gradient-to-b from-transparent to-[#00C48C]/5 p-8 md:p-16 rounded-[3rem] border border-[#00C48C]/10 text-center relative overflow-hidden">
+            <div class="absolute inset-0 opacity-20 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCI+PGNpcmNsZSBjeD0iMjAiIGN5PSIyMCIgcj0iMSIgZmlsbD0iIzAwQzQ4QyIvPjwvc3ZnPg==')]"></div>
+            
+            <i data-lucide="users" class="text-[#00C48C] w-12 h-12 mx-auto mb-6 relative z-10"></i>
+            <h2 class="text-4xl font-bold mb-6 relative z-10">Komunita ako motor disrupcie</h2>
+            
+            <div class="max-w-4xl mx-auto text-left grid md:grid-cols-2 gap-8 relative z-10 mb-16">
+                <div class="glass-panel p-6 bg-[#0B1C2D]/80">
+                    <h4 class="text-xl font-bold mb-2">ViVi Business+</h4>
+                    <p class="text-gray-400 text-sm">Pre lekárov a profesionálov ponúkame platobné terminály s <strong class="text-white">nulovými poplatkami</strong>. 90 % zisku nedávame do reklamy, ale priamo uzlom siete.</p>
+                </div>
+                <div class="glass-panel p-6 bg-[#0B1C2D]/80">
+                    <h4 class="text-xl font-bold mb-2">ViVi Foundation</h4>
+                    <p class="text-gray-400 text-sm"><strong class="text-white">Škola života:</strong> Testovanie vrodených talentov detí.<br/><strong class="text-white">Senior Healing:</strong> Bioenergetická podpora a zdieľanie skúseností staršej generácie.</p>
+                </div>
+            </div>
+
+            <div class="relative z-10 border-t border-white/10 pt-16">
+                <h2 class="text-5xl md:text-7xl font-extrabold mb-8">
+                    Budúcnosť je <span class="text-gradient">integrovaná.</span>
+                </h2>
+                <p class="text-xl text-gray-400 max-w-2xl mx-auto mb-10">
+                    Systém je navrhnutý tak, aby fungoval aj offline (pasívna záloha). Nečakajte na budúcnosť – vytvorte si ju.
+                </p>
+                <div class="flex flex-col sm:flex-row justify-center gap-4">
+                    <button class="bg-gradient-to-r from-[#00C48C] to-[#008f66] text-white px-8 py-4 rounded-full font-bold text-lg hover:shadow-[0_0_30px_rgba(0,196,140,0.5)] transition-all flex items-center justify-center gap-2">
+                        Vstúpiť do rodiny ViVi <i data-lucide="arrow-right"></i>
+                    </button>
+                    <button class="glass-panel px-8 py-4 rounded-full font-bold text-lg text-white hover:border-[#00C48C] transition-all">
+                        Získať skorý prístup
+                    </button>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Javascript Logic -->
+    <script>
+        // 1. Inicializácia Lucide ikon
+        lucide.createIcons();
+
+        // 2. Scroll Progress a Reveal Animácie
+        window.addEventListener('scroll', () => {
+            const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+            const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            const scrolled = (winScroll / height) * 100;
+            document.getElementById("scroll-progress").style.width = scrolled + "%";
+
+            const reveals = document.querySelectorAll('.reveal');
+            reveals.forEach(reveal => {
+                const windowHeight = window.innerHeight;
+                const elementTop = reveal.getBoundingClientRect().top;
+                const elementVisible = 150;
+                if (elementTop < windowHeight - elementVisible) {
+                    reveal.classList.add('active');
+                    
+                    // Ak odhalíme Green sekciu, spustíme animáciu stromov
+                    if(reveal.id === 'green-section' && !reveal.classList.contains('trees-grown')) {
+                        reveal.classList.add('trees-grown');
+                        document.querySelectorAll('.tree-bar').forEach((tree) => {
+                            tree.style.height = tree.getAttribute('data-height');
+                        });
+                    }
+                }
+            });
+        });
+        window.dispatchEvent(new Event('scroll')); // Initial check
+
+        // 3. FAQ Accordion Logika
+        document.querySelectorAll('.faq-header').forEach(header => {
+            header.addEventListener('click', () => {
+                const content = header.nextElementSibling;
+                const icon = header.querySelector('.faq-icon');
+                const parent = header.parentElement;
+                
+                // Zatvor všetky ostatné
+                document.querySelectorAll('.faq-content').forEach(c => {
+                    if(c !== content) {
+                        c.style.maxHeight = null;
+                        c.style.opacity = 0;
+                        c.classList.remove('pb-6');
+                        c.previousElementSibling.querySelector('.faq-icon').style.transform = "rotate(0deg)";
+                        c.parentElement.classList.remove('border-[#00C48C]/50');
+                    }
+                });
+
+                // Otvor/zatvor aktuálny
+                if (content.style.maxHeight) {
+                    content.style.maxHeight = null;
+                    content.style.opacity = 0;
+                    content.classList.remove('pb-6');
+                    icon.style.transform = "rotate(0deg)";
+                    parent.classList.remove('border-[#00C48C]/50');
+                } else {
+                    content.style.maxHeight = content.scrollHeight + 30 + "px"; // 30px pre pb-6 padding
+                    content.style.opacity = 1;
+                    content.classList.add('pb-6');
+                    icon.style.transform = "rotate(180deg)";
+                    parent.classList.add('border-[#00C48C]/50');
+                }
+            });
+        });
+
+        // 4. Interaktívna 3D Karta - On/Off prepínač
+        const switchBtn = document.getElementById('card-switch');
+        const card = document.getElementById('vivi-card');
+        const switchBg = document.getElementById('switch-bg');
+        const switchKnob = document.getElementById('switch-knob');
+        const iconOn = document.getElementById('icon-on');
+        const iconOff = document.getElementById('icon-off');
+        const cpuIcon = document.getElementById('cpu-icon');
+
+        switchBtn.addEventListener('click', () => {
+            const isOff = card.classList.contains('card-off');
+            if (!isOff) {
+                // Vypnúť kartu
+                card.classList.add('card-off');
+                card.classList.remove('bg-gradient-to-br', 'from-[#1a2e40]', 'to-[#0B1C2D]', 'border-[#00C48C]/50');
+                card.classList.add('bg-gray-800', 'border-gray-600');
+                
+                switchBg.classList.replace('bg-[#00C48C]', 'bg-gray-600');
+                switchKnob.classList.replace('translate-x-8', 'translate-x-0');
+                
+                iconOn.classList.add('hidden');
+                iconOff.classList.remove('hidden');
+                cpuIcon.classList.replace('text-[#D4AF37]', 'text-gray-500');
+            } else {
+                // Zapnúť kartu
+                card.classList.remove('card-off');
+                card.classList.add('bg-gradient-to-br', 'from-[#1a2e40]', 'to-[#0B1C2D]', 'border-[#00C48C]/50');
+                card.classList.remove('bg-gray-800', 'border-gray-600');
+                
+                switchBg.classList.replace('bg-gray-600', 'bg-[#00C48C]');
+                switchKnob.classList.replace('translate-x-0', 'translate-x-8');
+                
+                iconOn.classList.remove('hidden');
+                iconOff.classList.add('hidden');
+                cpuIcon.classList.replace('text-gray-500', 'text-[#D4AF37]');
+            }
+        });
+    </script>
+</body>
+</html>
