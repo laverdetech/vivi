@@ -234,6 +234,66 @@
         .accordion-item.active .chevron {
             transform: rotate(180deg);
         }
+
+        /* Cookie Consent Styles */
+        .cb-toggle {
+            position: relative;
+            display: inline-block;
+            width: 44px;
+            height: 24px;
+        }
+        .cb-toggle input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .cb-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: rgba(255, 255, 255, 0.1);
+            transition: .4s;
+            border-radius: 24px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .cb-slider:before {
+            position: absolute;
+            content: "";
+            height: 16px;
+            width: 16px;
+            left: 3px;
+            bottom: 3px;
+            background-color: #9ca3af;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        .cb-toggle input:checked + .cb-slider {
+            background-color: rgba(0, 196, 140, 0.2);
+            border-color: #00C48C;
+        }
+        .cb-toggle input:focus-visible + .cb-slider {
+            outline: 2px solid #00C48C;
+            outline-offset: 2px;
+        }
+        .cb-toggle input:checked + .cb-slider:before {
+            transform: translateX(20px);
+            background-color: #00C48C;
+        }
+        .cb-toggle input:disabled + .cb-slider {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .cb-toggle input:disabled:checked + .cb-slider:before {
+            background-color: #9ca3af;
+        }
+
+        #cb-banner {
+            transform: translateY(100%);
+            animation: slideUp 0.5s cubic-bezier(0.25, 0.8, 0.25, 1) forwards;
+        }
+        @keyframes slideUp {
+            to { transform: translateY(0); }
+        }
     </style>
 </head>
 <body class="antialiased font-sans">
@@ -970,6 +1030,77 @@
         </div>
     </div>
 
+    <!-- GDPR Cookie Banner & Modal -->
+    <button id="cb-revoke-btn" class="fixed bottom-24 sm:bottom-6 left-4 sm:left-6 z-[9998] w-12 h-12 rounded-full bg-vivi-blue border border-white/10 shadow-[0_0_15px_rgba(0,196,140,0.2)] hidden items-center justify-center text-gray-400 hover:text-white hover:border-vivi-green transition-all focus:outline-none focus:ring-2 focus:ring-vivi-green" aria-label="Nastavenia cookies" title="Nastavenia cookies">
+        <i data-lucide="cookie" class="w-5 h-5"></i>
+    </button>
+
+    <div id="cb-banner" class="fixed bottom-0 left-0 w-full z-[9999] p-4 hidden">
+        <div class="max-w-7xl mx-auto vivi-glass-card p-6 flex flex-col lg:flex-row gap-6 items-center border border-white/20 shadow-2xl bg-[#0B1C2D]/95">
+            <div class="flex-1">
+                <h3 class="text-lg font-bold mb-2 flex items-center gap-2"><i data-lucide="shield-check" class="w-5 h-5 text-vivi-green"></i> Ochrana vášho súkromia</h3>
+                <p class="text-sm text-gray-300 font-light leading-relaxed">
+                    Táto webstránka používa súbory cookies na zabezpečenie základného fungovania webu (nevyhnutné), na analýzu návštevnosti a personalizáciu obsahu. Svoj súhlas môžete slobodne udeliť, odmietnuť alebo prispôsobiť. Viac informácií nájdete v <a href="https://sprievodca-postom.netlify.app/privacy-policy" class="text-vivi-green hover:underline font-medium" target="_blank">Zásadách ochrany osobných údajov</a> a <a href="https://sprievodca-postom.netlify.app/cookies" class="text-vivi-green hover:underline font-medium" target="_blank">Pravidlách cookies</a>.
+                </p>
+            </div>
+            <div class="flex flex-wrap gap-3 justify-center lg:justify-end shrink-0 w-full lg:w-auto">
+                <button id="cb-btn-settings" class="vivi-cta-ghost text-sm min-h-[40px] flex-1 lg:flex-none">Nastavenia</button>
+                <button id="cb-btn-reject-all" class="vivi-cta-ghost text-sm min-h-[40px] flex-1 lg:flex-none">Odmietnuť všetko</button>
+                <button id="cb-btn-accept-all" class="vivi-cta-primary text-sm min-h-[40px] flex-1 lg:flex-none">Prijať všetko</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cookie Settings Modal -->
+    <div id="cb-modal-overlay" class="fixed inset-0 z-[10000] bg-[#0B1C2D]/80 backdrop-blur-sm hidden items-center justify-center p-4">
+        <div class="vivi-glass-card w-full max-w-2xl max-h-[90vh] flex flex-col p-0 overflow-hidden border border-white/20 shadow-[0_0_50px_rgba(0,0,0,0.5)] bg-[#0B1C2D]">
+            <div class="p-6 border-b border-white/10 flex justify-between items-center bg-white/5">
+                <h2 class="text-xl font-bold flex items-center gap-2"><i data-lucide="settings" class="w-5 h-5 text-vivi-green"></i> Nastavenia cookies</h2>
+                <button id="cb-modal-close" class="text-gray-400 hover:text-white transition-colors focus:outline-none focus:ring-2 focus:ring-vivi-green rounded-md p-1">
+                    <i data-lucide="x" class="w-6 h-6"></i>
+                </button>
+            </div>
+            <div class="p-6 overflow-y-auto space-y-6">
+                <!-- Necessary -->
+                <div class="border-b border-white/5 pb-6">
+                    <div class="flex justify-between items-center mb-2">
+                        <h3 class="font-bold text-white text-lg">Nevyhnutné cookies (Vždy aktívne)</h3>
+                        <label class="cb-toggle">
+                            <input type="checkbox" checked disabled aria-label="Nevyhnutné cookies">
+                            <span class="cb-slider"></span>
+                        </label>
+                    </div>
+                    <p class="text-sm text-gray-400 font-light leading-relaxed">Tieto cookies sú nevyhnutné pre správne fungovanie webstránky. Neukladajú žiadne osobné údaje a slúžia na uloženie vášho nastavenia súkromia alebo zaistenie bezpečnosti.</p>
+                </div>
+                <!-- Analytics -->
+                <div class="border-b border-white/5 pb-6">
+                    <div class="flex justify-between items-center mb-2">
+                        <h3 class="font-bold text-white text-lg">Analytické cookies</h3>
+                        <label class="cb-toggle">
+                            <input type="checkbox" id="cb-toggle-analytics" aria-label="Analytické cookies">
+                            <span class="cb-slider"></span>
+                        </label>
+                    </div>
+                    <p class="text-sm text-gray-400 font-light leading-relaxed">Pomáhajú nám pochopiť, ako návštevníci interagujú s webstránkou zbieraním a hlásením anonymných informácií. Bez nich nevieme vylepšovať náš obsah.</p>
+                </div>
+                <!-- Marketing -->
+                <div>
+                    <div class="flex justify-between items-center mb-2">
+                        <h3 class="font-bold text-white text-lg">Marketingové / Cielené cookies</h3>
+                        <label class="cb-toggle">
+                            <input type="checkbox" id="cb-toggle-marketing" aria-label="Marketingové cookies">
+                            <span class="cb-slider"></span>
+                        </label>
+                    </div>
+                    <p class="text-sm text-gray-400 font-light leading-relaxed">Používajú sa na sledovanie návštevníkov naprieč webstránkami. Zámerom je zobrazovať reklamy, ktoré sú relevantné a pútavé pre jednotlivého používateľa.</p>
+                </div>
+            </div>
+            <div class="p-6 border-t border-white/10 flex justify-end bg-white/5">
+                <button id="cb-btn-save-settings" class="vivi-cta-primary text-sm min-h-[40px]">Uložiť nastavenia</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Initialization Scripts -->
     <script>
         // Init Lucide Icons
@@ -1012,6 +1143,157 @@
                 element.classList.add('active');
             }
         }
+
+        // ==========================================
+        // COOKIE CONSENT LOGIC (GDPR 2025/2026 Compliant)
+        // Opt-in model, LocalStorage, Revokable
+        // ==========================================
+
+        const STORAGE_KEY = 'vivi_cookie_consent';
+        const CONSENT_VALIDITY_DAYS = 180; // Platnosť súhlasu max. 6 mesiacov
+
+        const banner = document.getElementById('cb-banner');
+        const revokeBtn = document.getElementById('cb-revoke-btn');
+        const modalOverlay = document.getElementById('cb-modal-overlay');
+        
+        const btnAcceptAll = document.getElementById('cb-btn-accept-all');
+        const btnRejectAll = document.getElementById('cb-btn-reject-all');
+        const btnSettings = document.getElementById('cb-btn-settings');
+        const btnCloseModal = document.getElementById('cb-modal-close');
+        const btnSaveSettings = document.getElementById('cb-btn-save-settings');
+        
+        const toggleAnalytics = document.getElementById('cb-toggle-analytics');
+        const toggleMarketing = document.getElementById('cb-toggle-marketing');
+
+        function getConsent() {
+            try {
+                const data = localStorage.getItem(STORAGE_KEY);
+                if (!data) return null;
+                const parsed = JSON.parse(data);
+                const now = new Date().getTime();
+                
+                // Expirácia súhlasu
+                if (now - parsed.timestamp > CONSENT_VALIDITY_DAYS * 24 * 60 * 60 * 1000) {
+                    localStorage.removeItem(STORAGE_KEY);
+                    return null;
+                }
+                return parsed;
+            } catch (e) {
+                return null;
+            }
+        }
+
+        function saveConsent(analytics, marketing) {
+            const oldConsent = getConsent();
+            // Kontrola, či používateľ odvolal niektorý z predtým udelených súhlasov
+            const revokedSomething = oldConsent && 
+                ((oldConsent.analytics && !analytics) || (oldConsent.marketing && !marketing));
+
+            const consentData = {
+                necessary: true,
+                analytics: analytics,
+                marketing: marketing,
+                timestamp: new Date().getTime()
+            };
+            
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(consentData));
+            
+            // Skrytie UI prvkov
+            banner.classList.add('hidden');
+            banner.classList.remove('block');
+            modalOverlay.classList.add('hidden');
+            modalOverlay.classList.remove('flex');
+            revokeBtn.classList.remove('hidden');
+            revokeBtn.classList.add('flex');
+
+            if (revokedSomething) {
+                // Ak odvolal súhlas, je bezpečné spraviť tvrdý reload,
+                // čím sa zastavia a vyčistia všetky už bežiace trackovacie skripty.
+                window.location.reload();
+            } else {
+                // Inak len spustíme skripty
+                triggerScripts(consentData);
+            }
+        }
+
+        // Placeholder funkcie (GDPR pravidlo: spustiť LEN ak je súhlas)
+        function initAnalytics() {
+            console.log('✅ Súhlas: Analytické skripty (napr. Google Analytics) inicializované.');
+            // Tu vlož svoj kód pre Google Analytics (napr. Google Tag Manager snippet)
+        }
+
+        function initMarketing() {
+            console.log('✅ Súhlas: Marketingové skripty (napr. Meta Pixel) inicializované.');
+            // Tu vlož svoj kód pre marketingové skripty
+        }
+
+        function triggerScripts(consent) {
+            if (consent.analytics && !window.analyticsLoaded) {
+                initAnalytics();
+                window.analyticsLoaded = true;
+            }
+            if (consent.marketing && !window.marketingLoaded) {
+                initMarketing();
+                window.marketingLoaded = true;
+            }
+        }
+
+        function showModal() {
+            const currentConsent = getConsent();
+            // Predvolene sú checkboxy odškrtnuté (Opt-in), alebo zobrazia aktuálny stav
+            toggleAnalytics.checked = currentConsent ? currentConsent.analytics : false;
+            toggleMarketing.checked = currentConsent ? currentConsent.marketing : false;
+            
+            modalOverlay.classList.remove('hidden');
+            modalOverlay.classList.add('flex');
+            
+            // Focus management pre klávesovú prístupnosť
+            document.getElementById('cb-btn-save-settings').focus();
+        }
+
+        // Event Listenery
+        btnAcceptAll.addEventListener('click', () => saveConsent(true, true));
+        btnRejectAll.addEventListener('click', () => saveConsent(false, false));
+        btnSettings.addEventListener('click', showModal);
+        revokeBtn.addEventListener('click', showModal);
+        
+        btnCloseModal.addEventListener('click', () => {
+            modalOverlay.classList.add('hidden');
+            modalOverlay.classList.remove('flex');
+        });
+        
+        btnSaveSettings.addEventListener('click', () => {
+            saveConsent(toggleAnalytics.checked, toggleMarketing.checked);
+        });
+
+        // Zatvorenie modalu kliknutím na overlay alebo ESC klávesou
+        modalOverlay.addEventListener('click', (e) => {
+            if (e.target === modalOverlay) {
+                modalOverlay.classList.add('hidden');
+                modalOverlay.classList.remove('flex');
+            }
+        });
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && !modalOverlay.classList.contains('hidden')) {
+                modalOverlay.classList.add('hidden');
+                modalOverlay.classList.remove('flex');
+            }
+        });
+
+        // Inicializácia pri načítaní stránky
+        document.addEventListener('DOMContentLoaded', () => {
+            const currentConsentState = getConsent();
+            if (!currentConsentState) {
+                // Nemáme platný súhlas - zobrazíme banner
+                banner.classList.remove('hidden');
+                banner.classList.add('block');
+            } else {
+                // Súhlas existuje - potichu spustíme skripty a zobrazíme plávajúce tlačidlo
+                revokeBtn.classList.remove('hidden');
+                revokeBtn.classList.add('flex');
+                triggerScripts(currentConsentState);
+            }
+        });
     </script>
 </body>
 </html>
